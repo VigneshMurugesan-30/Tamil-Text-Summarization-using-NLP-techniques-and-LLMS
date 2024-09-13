@@ -87,29 +87,6 @@ Sentences are grouped into clusters based on their feature representations, and 
 
 - **ROUGE-1, ROUGE-2, and ROUGE-L**: Metrics used to evaluate the quality of summarization.
 
----
-
-## Abstractive Summarization Results
-
-The following results were generated using the models (mBART, MT5, M2M100) on Tamil text summarization tasks:
-
-### Summarized Example:
-
-Original Text:
-> "இ� �ற��� அவ� ப�ப�ச� தமிழிட� ��ைகய��, "இ����ைப மிக� ச�ற�த ��ேபா�கான ���பாக பா��க�ேற�. அ��பைட உரிைம எ�ன எ�பைத மிக�� �வ�ரமாக இ����� வ�ள�க���ள�" எ�றா�."
-
-### Model Summarization Output:
-
-1. **mBART**:
-   - "இ�த�ய அரச�யலைம�ப�� 21-ஆவ� வ�த�ைய மிக�� ஆழமாக �த�ம�ற� வ�ள�க���ள� எ���, ஏ�கனேவ இர�� ேவ� வழ��களி� தனி நப� அ�தர�க�ைத அ��பைட உரிைம பா�கா�கா�."
-
-2. **MT5**:
-   - "இ�த�ய அரச�யலைம�ப�� 21-ஆவ� வ�த�ைய மிக�� ஆழமாக �த�ம�ற� வ�ள�க���ள� எ���, ஏ�கனேவ �ந��க� கால�த�� �த�பத� எ�.ஆ�."
-
-3. **M2M100**:
-   - "அ��பைட உரிைம எ�ன எ�பைத மிக�� �வ�ரமாக இ����� வ�ள�க���ள�" எ�றா�."
-
----
 
 ## Advantages of the Approach
 
