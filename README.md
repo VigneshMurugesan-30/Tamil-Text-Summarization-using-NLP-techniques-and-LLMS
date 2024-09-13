@@ -3,110 +3,119 @@ This project develops a Speech-to-Speech Translation system to convert Tamil spe
 
 ---
 
-## Introduction
+## Dataset Information
 
-Tamil and Telugu are prominent Dravidian languages spoken primarily in the southern part of India. Despite their rich literary traditions, there are limited resources available for developing advanced language technologies for these languages. With the increasing need for multilingual communication in India, there is a significant demand for effective translation systems that cater to regional languages.
-
-Speech-to-Speech Translation (S2ST) is an interdisciplinary field combining:
-1. **Automatic Speech Recognition (ASR)**: Converts spoken Tamil into written text.
-2. **Machine Translation (MT)**: Translates the text from Tamil to Telugu.
-3. **Text-to-Speech (TTS)**: Synthesizes the translated text into spoken Telugu.
+- **Training Data**: 350+ Wikipedia articles
+- **Validation Data**: 90 Wikipedia articles
 
 ---
 
-## Reference Studies and Key Findings
+## Preprocessing Steps
 
-### Multilingual Automatic Speech Recognition (ASR) using Common Voice Corpus (Ardila et al., 2019)
-- Emphasized community participation in building robust speech corpora and demonstrated the performance of ASR systems across different languages.
-
-### Speech-to-Speech Machine Translation (Mujadia and Sharma, 2023)
-- Developed a system utilizing ASR, MT, Subtitling (SRT), and TTS for accurate video translation across languages.
-
-### Text Processing for TTS in Indian Languages (Raj et al., 2007)
-- Addressed challenges in Font-to-Akshara mapping, pronunciation rules, and text normalization to ensure natural speech synthesis.
+1. **Text Cleaning**: Removing special characters.
+2. **Tokenization**: Using n-grams and NLTK.
+3. **Analysis of Document Lengths**: Truncating documents to 448 tokens.
+4. **Saving Preprocessed Data**: Storing the cleaned data for training.
+5. **Features Extraction**: TF, IDF, TF-IDF, and stopword removal.
 
 ---
 
-## Dataset: Common Voice 11
+## Model Selection
 
-- **Audio Recordings**: This dataset consists of Tamil audio clips contributed by volunteers. The clips contain sentences read aloud by various speakers.
-- **Transcriptions**: Each audio recording has a corresponding text transcription.
-- **Metadata**: Speaker demographics, recording quality, and clip duration are included.
+- **MTM Model by Facebook**
+- **MT5 Model by Facebook**
+- **mBART Model**
 
-| Data Split | Rows  |
-|------------|-------|
-| Train      | 2000  |
-| Validation | 400   |
-| Test       | 200   |
+### Extractive vs. Abstractive Summarization
 
----
-
-## Methodology
-
-### Models Used
-1. **ASR**: `vasista22/whisper-tamil-medium`
-2. **Text-to-Text**: `ai4bharat/indictrans2-indic-indic-dist-320M`
-3. **TTS**: `facebook/mms-tts-kff-script_telugu`
-
-### ASR Model Preprocessing
-- Unnecessary metadata columns were removed.
-- Audio was uniformly sampled at 16,000 Hz.
-- **WhisperFeatureExtractor** and **WhisperTokenizer** were initialized using a pre-trained model specific to Tamil.
-
-### Training Parameters
-The models were trained and evaluated using the **Common Voice 11** dataset. Word Error Rate (WER) results for different models are as follows:
-
-| Model                           | WER   |
-|----------------------------------|-------|
-| Vignesh-M/Whisper-tamil-medium   | 38.60 |
-| vasista22/whisper-tamil-medium   | 41.81 |
-| AI4Bharat/Indic-Whisper          | 44.54 |
-| FaceBook/Wav2Vec                 | 71.58 |
+- **Extractive Approach**: Selects key sentences from the original text.
+- **Abstractive Approach**: Generates new sentences based on the understanding of the text.
 
 ---
 
-## Results
+## Sentence Scoring Method
 
-### Text-to-Text Model
+### Methodology:
 
-The Indic-trans model architecture (Gala, Jay, et al., 2023) was used to evaluate translation performance using BLEU, Cosine Similarity, and Rouge-L scores:
+- **Surface Score Components**:
+  - Position Score
+  - Length Score
+  - Paragraph Score
+  - Heading Score
 
-| Evaluation Metric | Score   |
-|-------------------|---------|
-| BLEU              | 0.57    |
-| Cosine Similarity | 0.69597 |
-| Rogue L Score     | 0.55453 |
+Sentences are scored based on these components, and the highest-scoring sentences are selected for summarization.
 
-### Text-to-Speech (TTS) Model
+### Sentence Weighing:
 
-Massively Multilingual Speech (MMS) models were used for TTS, employing adversarial learning and variational inference techniques. The final synthesis results were evaluated with the Mean Opinion Score (MOS):
-
-| Model                      | MOS   |
-|-----------------------------|-------|
-| Ground Truth                | 4.46  |
-| Tacotron 2                  | 4.25  |
-| VITS-based MMS              | 4.43  |
+- **Methodology**:
+  - Edit Distance Calculation for Sentence Length Score Weight (LSW).
+  - Combines LSW and word frequency to rank sentences.
+  - Higher-ranked sentences are selected for summarization.
 
 ---
 
-## Conclusion
+## Sentence Clustering
 
-Our project has delivered a robust speech processing system encompassing ASR, translation, and synthesis. We've achieved accurate transcription, seamless translation, and natural-sounding speech synthesis. Through meticulous data preprocessing and model training, this tool has improved multilingual communication and accessibility.
+Sentences are grouped into clusters based on their feature representations, and representative sentences are selected to form a coherent summary.
 
----
+### Methodology:
 
-## Future Work and Enhancements
-
-1. **Direct Speech-to-Speech Translation**: We aim to reduce inefficiencies by implementing direct speech-to-speech translation models like Google's Translatotron 3.
-2. **Reduced Latency**: Eliminating intermediate text processing will help improve translation speed and accuracy.
-3. **Enhanced Naturalness**: Retaining the prosody and intonation of original speech will further improve natural-sounding translations.
+1. **Feature Representation**: Extract features to represent the importance of terms in each sentence.
+2. **Clustering**: Use the KMeans algorithm to partition sentences into clusters.
+3. **Sentence Selection**: Choose representative sentences based on proximity to the cluster centroid.
 
 ---
 
-## References
+## Models Used
 
-- Kim, Jaehyeon, Jungil Kong, and Juhee Son. *"Conditional Variational Autoencoder with Adversarial Learning for End-to-End Text-to-Speech"*. International Conference on Machine Learning, 2021.
-- Bhogale, Kaushal Santosh, et al. *"Vistaar: Diverse Benchmarks and Training Sets for Indian Language ASR"*. arXiv preprint arXiv:2305.15386, 2023.
-- Chowdary, Divi Eswar, et al. *"Transformer‐Based Multilingual Automatic Speech Recognition (ASR) Model for Dravidian Languages"*. Automatic Speech Recognition and Translation for Low Resource Languages, 2024.
+- **mBART**: Finetuned for Tamil text summarization.
+- **MT5**: Another abstractive summarization model.
+- **M2M100**: For multilingual text summarization tasks.
 
-For additional results, check the [translated audio samples](https://drive.google.com/drive/folders/1NeuGFZlLyw8jjl9_fxtDLWFKZ9sBscST?usp=sharing).
+### Training Configuration
+
+- **Learning Rate**
+- **Batch Size**
+- **Number of Epochs**
+- **Warmup Steps**
+- **Weight Decay**
+- **Logging Steps**
+
+---
+
+## Evaluation Metrics
+
+- **ROUGE-1, ROUGE-2, and ROUGE-L**: Metrics used to evaluate the quality of summarization.
+
+---
+
+## Abstractive Summarization Results
+
+The following results were generated using the models (mBART, MT5, M2M100) on Tamil text summarization tasks:
+
+### Summarized Example:
+
+Original Text:
+> "இ� �ற��� அவ� ப�ப�ச� தமிழிட� ��ைகய��, "இ����ைப மிக� ச�ற�த ��ேபா�கான ���பாக பா��க�ேற�. அ��பைட உரிைம எ�ன எ�பைத மிக�� �வ�ரமாக இ����� வ�ள�க���ள�" எ�றா�."
+
+### Model Summarization Output:
+
+1. **mBART**:
+   - "இ�த�ய அரச�யலைம�ப�� 21-ஆவ� வ�த�ைய மிக�� ஆழமாக �த�ம�ற� வ�ள�க���ள� எ���, ஏ�கனேவ இர�� ேவ� வழ��களி� தனி நப� அ�தர�க�ைத அ��பைட உரிைம பா�கா�கா�."
+
+2. **MT5**:
+   - "இ�த�ய அரச�யலைம�ப�� 21-ஆவ� வ�த�ைய மிக�� ஆழமாக �த�ம�ற� வ�ள�க���ள� எ���, ஏ�கனேவ �ந��க� கால�த�� �த�பத� எ�.ஆ�."
+
+3. **M2M100**:
+   - "அ��பைட உரிைம எ�ன எ�பைத மிக�� �வ�ரமாக இ����� வ�ள�க���ள�" எ�றா�."
+
+---
+
+## Advantages of the Approach
+
+- Structured sentence selection based on relevance.
+- Customizable scoring criteria.
+- Balanced between document structure and content.
+- Flexibility in weighting schemes.
+- Efficient sentence clustering to capture key themes.
+
